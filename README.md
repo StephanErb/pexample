@@ -225,6 +225,7 @@ Further reading:
 * https://www.pantsbuild.org/3rdparty_py.html
 * https://www.pantsbuild.org/build_dictionary.html
 
-Useful talks:
+Helpful talks:
 
-* WTF is PEX https://www.youtube.com/watch?v=NmpnGhRwsu0
+* [The Pants Build Tool at Twitter](https://www.youtube.com/watch?v=j_4CVpOIWsE)
+* [WTF is PEX](https://www.youtube.com/watch?v=NmpnGhRwsu0)
