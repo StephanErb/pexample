@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import click
 from hello_world.messages.greeting import greet
 
