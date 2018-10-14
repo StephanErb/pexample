@@ -5,4 +5,5 @@ python_tests(
   dependencies=[
     'src/python/hello_world/messages',
   ],
+  sources=globs('*.py'),
 )
