@@ -124,7 +124,7 @@ that changed between branches or since a particular commit:
     $ ./pants --changed-include-dependees=direct --changed-parent=master test
 
     # Run tests for anything changed since a commit SHA
-    $ ./pants --changed-include-dependees=direct --changed-changes-since=101e8b2562 test
+    $ ./pants --changed-include-dependees=direct --changed-changes-since=793078bd4f test
 
 
 ## Python Code Quality Tools
@@ -140,7 +140,7 @@ Pants ships with a plugin for `isort` to ensure imports are properly grouped and
 Pants can also be used to run `pep8`, `pyflakes`, and a few additional quality checks:
 
     # run stylechecks for all python files
-    ./pants lint {src,tests}/python::
+    ./pants lint {src,tests}/python/hello_world::
 
 
 ## Interactive Python Sessions
@@ -150,13 +150,13 @@ Within such a session it is then possible to import a target's code and its depe
 
     $ ./pants repl src/python/hello_world/messages
     >>> from hello_world.messages.animals import cow
-    >>> print cow('Hello Betty')
+    >>> print(cow('Hello Betty'))
 
 It is also possible to drop into an interactive session for a PEX binary:
 
     $ PEX_INTERPRETER=1 ./dist/hello_world.pex
     >>> from hello_world.messages.animals import unicorn
-    >>> print unicorn('wow unicorn')
+    >>> print(unicorn('wow unicorn'))
 
 
         \
@@ -208,12 +208,57 @@ corresponding to a single filesystem directory. It turns out that this is often 
 level of granularity for targets. It's by no means required, but has proven in practice to be a good
 rule of thumb.
 
-To list all build targets in a repository:
+To list all build targets in a repository (but use with care in a large repo):
 
     /pants list ::
 
+### BUILD Example: Binaries
+ 
+PEX files in Pants are declared via the `python_binary` target type.  Commonly used optiones include the binary name and the dependencies, but also the interpreter compatibility as well as the target platform. This allows users to build binaries for different Python versions and operating systems:
 
-## References
+    python_binary(
+      name='math_fun_py2',
+      entry_point='math_fun.cli.main:main',
+      dependencies=[
+        ':_cli',
+      ],
+      platforms=[
+        'current',
+        'linux-x86_64',
+        'macosx-10.6-x86_64',
+      ],
+      compatibility=['CPython>=2.7,<3'],
+      tags=['legacy_python']
+    )
+
+### Build Example: Source Distributions
+
+In addition to PEX files, Pants can also generate source distributions. Source distributions can be installed via `pip` and uploaded to PyPi.org. All you need is a `provides=setup_py` addition for your targets:
+
+    python_library(
+      dependencies=[
+        '3rdparty/python:numpy',
+      ],
+      compatibility=['CPython>=2.7,<3', 'CPython>=3.4'],
+      provides=setup_py(
+        name='math_fun',
+        version='0.0.24', # can also be dynamic. BUILD files are just Python
+        description='Math lib as a source distribution',
+        zip_safe=True,
+        classifiers=[
+          'Intended Audience :: Developers',
+          'Programming Language :: Python',
+        ]
+      )
+    )
+
+Pants can the be used to generate the source distribution. Similar to binaries, those will be placed in the `dist` folder:
+
+    $ ./pants setup-py src/python/math_fun/lib
+    $ ls dist/math_fun-0.0.24.tar.gz
+    
+
+## References 
 
 Most of the content above is directly extracted from the [pants](https://www.pantsbuild.org/) and
 [PEX](https://pex.readthedocs.io/) documentation.
