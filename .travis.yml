@@ -1,17 +1,13 @@
-before_cache:
-  # The stats cache contains timestamped reports unused by CI but that
-  # thrash the cache.  Skip caching these.
-  - rm -rf ${HOME}/.cache/pants/stats
-
-cache:
-  directories:
-    - ${HOME}/.cache/pants
-
 language: python
+dist: xenial
 python:
-  - '3.4'
-  - '3.5'
   - '3.6'
+  - '3.7'
+
+before_install:
+  # work around https://github.com/travis-ci/travis-ci/issues/8363
+  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
+  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/pyenv/d' | tr "\n" ":" | sed "s|::|:|g")
 
 script:
   - ./build-support/travis/build.sh
