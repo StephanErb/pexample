@@ -3,7 +3,7 @@
 This repository features a running example of the [pants](https://www.pantsbuild.org/) build system
 and Python packaging with [PEX](https://pex.readthedocs.io/).
 
-
+[![Build](https://github.com/StephanErb/pexample/actions/workflows/main.yaml/badge.svg)](https://github.com/StephanErb/pexample/actions/workflows/main.yaml)
 
 ## What is Pants?
 
