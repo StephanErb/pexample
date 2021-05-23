@@ -91,14 +91,14 @@ As a build system pants is also responsible for running tests:
     $ ./pants test ::
 
     # Run one specific test target
-    $ ./pants test tests/python/hello_world/messages:tests
+    $ ./pants test tests/python/hello_world/messages
 
 Under the hood pants is using `pytest`. We can pass arbitrary arguments to pytest (i.e.,
 anything after `--`). For example, we can use `-k` to limit the test execution to tests
 containing a particular name:
 
     # Run tests whose name contains "cow"
-    ./pants test tests/python/hello_world/messages:tests -- -k cow
+    ./pants test tests/python/hello_world/messages -- -k cow
 
 Pants can also leverage SCM information to restrict operations to a set of changed targets and
 thus improve turnaround times:
