@@ -1,6 +1,8 @@
-.pants.d
-dist
-.pids
-.pants.workdir.file_lock
-.cache
+# Python
 *.pyc
+
+# Pants workspace files
+/.pants.d/
+/dist/
+/.pids
+/.pants.workdir.file_lock*

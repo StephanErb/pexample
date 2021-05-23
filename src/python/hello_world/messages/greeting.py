@@ -5,10 +5,10 @@ from hello_world.messages.animals import cow, unicorn
 def greet(greetee, mode):
     greeting = green("Hello {}!".format(greetee))
 
-    if mode == 'cow':
+    if mode == "cow":
         return cow(greeting)
-    elif mode == 'unicorn':
+    elif mode == "unicorn":
         return unicorn(greeting)
     else:
-        assert mode == 'plain'
+        assert mode == "plain"
         return greeting

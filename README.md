@@ -3,7 +3,6 @@
 This repository features a running example of the [pants](https://www.pantsbuild.org/) build system
 and Python packaging with [PEX](https://pex.readthedocs.io/).
 
-[![Build Status](https://travis-ci.org/StephanErb/pexample.svg?branch=master)](https://travis-ci.org/StephanErb/pexample)
 
 
 ## What is Pants?
@@ -12,9 +11,8 @@ Pants is a build system for large or rapidly growing code bases. It supports all
 build: tool bootstrapping, code generation, third-party dependency resolution, compilation, test
 running, linting, bundling and more.
 
-Pants supports Java, Scala, Python, C/C++, Go, Thrift, Protobuf and Android code. Support for other
-languages, frameworks, and code generators can be added by authoring plugins through a well defined
-module interface.
+The latest version of pants is currently focused on Python, with support for other languages coming
+(back) soon.
 
 With pants, you can organize your code via targets for binaries, libraries, and tests. For Python
 programmers, pants is especially interesting, as it makes the manipulation and distribution
@@ -37,12 +35,12 @@ In this example, everything is controlled via the `./pants` script that will aut
 bootstrap pants and its dependencies.
 
     # bootstrap
-    $ ./pants
+    $ ./pants --version
 
 Let's start with something simple:
 
     # List everything pants can do for us
-    $ ./pants goals
+    $ ./pants help goals
 
     # List all registered source roots
     $ ./pants roots
@@ -53,25 +51,25 @@ According to the command above, we have tests defined. Let's run them (using the
 
 The example also comes with a (highly sophisticated) command line client:
 
-    $ ./pants -q run src/python/hello_world/cli:hello_world
+    $ ./pants run src/python/hello_world/cli:hello_world
     Hello World!
 
 We can also build a self-contained PEX binary with our code, so that it can be used independent of
 pants and the build environment:
 
-    $ ./pants binary src/python/hello_world/cli:hello_world
+    $ ./pants package src/python/hello_world/cli:hello_world
 
 The binary is dropped into `dist/`. Let's run it:
 
-    $ ./dist/hello_world.pex
+    $ ./dist/src.python.hello_world.cli/hello_world.pex
     Hello World!
 
-    $ ./dist/hello_world.pex --name Stephan
+    $ ./dist/src.python.hello_world.cli/hello_world.pex --name Stephan
     Hello Stephan!
 
 Mhh, let's make that a bit more exciting:
 
-    $ ./dist/hello_world.pex --name Stephan --mode cow
+    $ ./dist/src.python.hello_world.cli/hello_world.pex --name Stephan --mode cow
 
     ________________
     < Hello Stephan! >
@@ -90,7 +88,7 @@ Better :)
 As a build system pants is also responsible for running tests:
 
     # Run all tests (using the recursive wildcard ::)
-    $ ./pants test tests::
+    $ ./pants test ::
 
     # Run one specific test target
     $ ./pants test tests/python/hello_world/messages
@@ -109,38 +107,35 @@ thus improve turnaround times:
     #       of `src/python/hello_world/messages/greetings.py`
 
     # List all changed targets with uncommitted changes
-    $ ./pants --changed-parent=HEAD list
+    $ ./pants --changed-since=HEAD list
 
     # Run tests for all targets listed above and their direct dependencies
-    $ ./pants --changed-parent=HEAD --changed-include-dependees=direct test
+    $ ./pants --changed-since=HEAD --changed-dependees=direct test
 
     # Run tests for all targets directly or transitively depending on the changed targets
-    $ ./pants --changed-parent=HEAD --changed-include-dependees=transitive test
+    $ ./pants --changed-since=HEAD --changed-dependees=transitive test
 
 On build servers such as Jenkins it can also be useful to run tests for anything
 that changed between branches or since a particular commit:
 
     # Run tests for anything changed on this branch (compared to master)
-    $ ./pants --changed-include-dependees=direct --changed-parent=master test
-
-    # Run tests for anything changed since a commit SHA
-    $ ./pants --changed-include-dependees=direct --changed-changes-since=793078bd4f test
+    $ ./pants --changed-since=origin/master --changed-dependees=transitive test
 
 
 ## Python Code Quality Tools
 
-Pants ships with a plugin for `isort` to ensure imports are properly grouped and sorted:
+Pants ships with a plugins such as `isort`, `black`, and `flake8` to ensure code is consistent:
 
-    # check sort order of everything in src/python
-    ./pants fmt.isort src/python:: -- --diff --check-only
+    # Run quality checks on everything
+    ./pants lint :: 
 
-    # correct sort order for all python files
-    ./pants fmt.isort {src,tests}/python::
+    # correct sort order and formatting for everything
+    ./pants fmt ::
 
-Pants can also be used to run `pep8`, `pyflakes`, and a few additional quality checks:
+We can also run mypy to check (optional) Python types:
 
-    # run stylechecks for all python files
-    ./pants lint {src,tests}/python/hello_world::
+    # Run mypy on everything
+    ./pants typecheck ::
 
 
 ## Interactive Python Sessions
@@ -154,7 +149,7 @@ Within such a session it is then possible to import a target's code and its depe
 
 It is also possible to drop into an interactive session for a PEX binary:
 
-    $ PEX_INTERPRETER=1 ./dist/hello_world.pex
+    $ PEX_INTERPRETER=1 ./dist/src.python.hello_world.cli/hello_world.pex
     >>> from hello_world.messages.animals import unicorn
     >>> print(unicorn('wow unicorn'))
 
@@ -188,73 +183,73 @@ It is also possible to drop into an interactive session for a PEX binary:
 
 A large, well-organized codebase divides into many small components. These components, and the code
 dependencies between them, form a directed graph. This graph is then used for various operations,
-such as compilation and fine-grained invalidation.
+such as compilation and fine-grained cache invalidation.
 
 Components in pants are defined using `BUILD` files containing directives (so called targets) such
 as:
 
     python_library(
       name='mytarget',
-      sources=globs('*.py'),
       dependencies=[
-        '3rdparty/python:click',
-        'src/python/hello_world/foo',
-        'src/python/hello_world/bar',
+        '3rdparty/python:external_dep',
+        'src/python/foobar/my_explicit_dependency',
       ]
     )
+
+Fortunately for us, pants detects imported Python packages automatically, so we don't need to specify
+those dependencies manually!
 
 Many programming languages (E.g., Java, Python, Go) have a concept of a package, usually
 corresponding to a single filesystem directory. It turns out that this is often the appropriate
 level of granularity for targets. It's by no means required, but has proven in practice to be a good
 rule of thumb.
 
-To list all build targets in a repository (but use with care in a large repo):
+To make it simpler to follow these best practices, pants can even auto-generate `BUILD` files:
 
-    /pants list ::
+    ./pants tailor
+
+To list all build targets in a repository:
+
+    ./pants list ::
 
 ### BUILD Example: Binaries
  
-PEX files in Pants are declared via the `python_binary` target type.  Commonly used optiones include the binary name and the dependencies, but also the interpreter compatibility as well as the target platform. This allows users to build binaries for different Python versions and operating systems:
+PEX files in Pants are declared via the `pex_binary` target type.  Commonly used optiones include the
+binary name and the dependencies, but also the interpreter compatibility as well as the target platform.
+This allows users to build binaries for different Python versions and operating systems:
 
-    python_binary(
-      name='math_fun_py2',
+    pex_binary(
+      name='math_fun',
       entry_point='math_fun.cli.main:main',
-      dependencies=[
-        ':_cli',
-      ],
       platforms=[
         'current',
-        'linux-x86_64',
-        'macosx-10.6-x86_64',
-      ],
-      compatibility=['CPython>=2.7,<3'],
-      tags=['legacy_python']
+        'macosx-10.9-x86_64-cp-38-cp38',
+      ]
     )
 
 ### Build Example: Source Distributions
 
-In addition to PEX files, Pants can also generate source distributions. Source distributions can be installed via `pip` and uploaded to PyPi.org. All you need is a `provides=setup_py` addition for your targets:
+In addition to PEX files, Pants can also generate source distributions. Source distributions can be installed
+via `pip` and uploaded to PyPi.org. All you need is a `python_distribution`:
 
-    python_library(
-      dependencies=[
-        '3rdparty/python:numpy',
-      ],
-      compatibility=['CPython>=2.7,<3', 'CPython>=3.4'],
+    python_distribution(
+      name='wheel',
+      dependencies=[':lib'], # reference libraries to include
       provides=setup_py(
         name='math_fun',
         version='0.0.24', # can also be dynamic. BUILD files are just Python
         description='Math lib as a source distribution',
-        zip_safe=True,
         classifiers=[
           'Intended Audience :: Developers',
           'Programming Language :: Python',
-        ]
-      )
+        ]   
+      ),  
+      setup_py_commands=["bdist_wheel", "sdist"]
     )
 
 Pants can the be used to generate the source distribution. Similar to binaries, those will be placed in the `dist` folder:
 
-    $ ./pants setup-py src/python/math_fun/lib
+    $ ./pants package src/python/math_fun/lib:wheel
     $ ls dist/math_fun-0.0.24.tar.gz
     
 
@@ -265,10 +260,10 @@ Most of the content above is directly extracted from the [pants](https://www.pan
 
 Further reading:
 
-* https://www.pantsbuild.org/first_concepts.html
-* https://www.pantsbuild.org/python_readme.html
-* https://www.pantsbuild.org/3rdparty_py.html
-* https://www.pantsbuild.org/build_dictionary.html
+* https://www.pantsbuild.org/docs/how-does-pants-work
+* https://www.pantsbuild.org/docs/concepts
+* https://www.pantsbuild.org/docs/python
+* https://github.com/pantsbuild/example-python
 
 Helpful talks:
 

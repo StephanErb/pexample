@@ -1,0 +1,42 @@
+name: Pants
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v2
+      id: cache
+      with:
+        path: |
+          ~/.cache/pants/setup
+          ~/.cache/pants/named_caches
+          ~/.cache/pants/lmdb_store
+        key: ${{ runner.os }}-
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: bootstrap
+      run: |
+        ./pants --version
+    - name: Lint
+      run: | 
+        ./pants lint typecheck ::
+    - name: Test
+      run: |
+        ./pants test ::
+    - name: Package / Run
+      run: |
+        # We also smoke test that our release process will work by running `package`.
+        ./pants package ::
+        ./dist/src.python.hello_world.cli/hello_world.pex
