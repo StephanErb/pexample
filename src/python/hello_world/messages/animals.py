@@ -2,7 +2,8 @@ from textwrap import dedent
 
 
 def cow(message):
-    return dedent("""
+    return dedent(
+        """
          ________________
          < {} >
          ----------------
@@ -11,11 +12,13 @@ def cow(message):
                     (__)\\       )\\/
                         ||----w |
                         ||     ||
-    """).format(message)
+    """
+    ).format(message)
 
 
 def unicorn(message):
-    return dedent("""
+    return dedent(
+        """
 
                   \\
                    \\
@@ -40,4 +43,5 @@ def unicorn(message):
                           ,.-' >.'
                          <.'_.''
                            <'
-    """).format(message)
+    """
+    ).format(message)
