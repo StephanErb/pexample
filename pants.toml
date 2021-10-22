@@ -7,12 +7,14 @@ backend_packages = [
   'pants.backend.python.lint.isort',
   'pants.backend.python.lint.flake8',
   'pants.backend.python.typecheck.mypy',
+  'pants.backend.experimental.docker',
 ]
 
 [source]
 root_patterns = [
   '/3rdparty/python',
   '/src/python',
+  '/src/docker',
   '/tests/python',
 ]
 
