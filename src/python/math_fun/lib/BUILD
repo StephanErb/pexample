@@ -7,7 +7,7 @@ python_library()
 python_distribution(
   name='wheel',
   dependencies=[':lib'], # reference library above
-  provides=setup_py(
+  provides=python_artifact(
     name='math_fun',
     version='0.0.24', # can also be dynamic. BUILD files are just Python
     description='Math lib as a source distribution',

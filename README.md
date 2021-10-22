@@ -235,7 +235,7 @@ via `pip` and uploaded to PyPi.org. All you need is a `python_distribution`:
     python_distribution(
       name='wheel',
       dependencies=[':lib'], # reference libraries to include
-      provides=setup_py(
+      provides=python_artifact(
         name='math_fun',
         version='0.0.24', # can also be dynamic. BUILD files are just Python
         description='Math lib as a source distribution',

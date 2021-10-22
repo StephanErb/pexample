@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.5.0"
+pants_version = "2.7.0"
 
 backend_packages = [
   'pants.backend.python',
@@ -39,3 +39,8 @@ config = [".isort.cfg"]
 
 [mypy]
 config = ".mypy.ini"
+
+# Let's be a good OSS citizen!
+[anonymous-telemetry]
+enabled = true
+repo_id = "a20f5ec5-297a-4ed3-9cc2-ea96a5224015"
