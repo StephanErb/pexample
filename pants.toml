@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.5.0"
+pants_version = "2.7.0"
 
 backend_packages = [
   'pants.backend.python',
@@ -7,12 +7,14 @@ backend_packages = [
   'pants.backend.python.lint.isort',
   'pants.backend.python.lint.flake8',
   'pants.backend.python.typecheck.mypy',
+  'pants.backend.experimental.docker',
 ]
 
 [source]
 root_patterns = [
   '/3rdparty/python',
   '/src/python',
+  '/src/docker',
   '/tests/python',
 ]
 
@@ -39,3 +41,8 @@ config = [".isort.cfg"]
 
 [mypy]
 config = ".mypy.ini"
+
+# Let's be a good OSS citizen!
+[anonymous-telemetry]
+enabled = true
+repo_id = "a20f5ec5-297a-4ed3-9cc2-ea96a5224015"

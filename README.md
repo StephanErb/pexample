@@ -98,7 +98,7 @@ anything after `--`). For example, we can use `-k` to limit the test execution t
 containing a particular name:
 
     # Run tests whose name contains "cow"
-    ./pants test tests/python/hello_world/messages -- -k cow
+    $ ./pants test tests/python/hello_world/messages -- -k cow
 
 Pants can also leverage SCM information to restrict operations to a set of changed targets and
 thus improve turnaround times:
@@ -127,15 +127,15 @@ that changed between branches or since a particular commit:
 Pants ships with a plugins such as `isort`, `black`, and `flake8` to ensure code is consistent:
 
     # Run quality checks on everything
-    ./pants lint :: 
+    $ ./pants lint :: 
 
     # correct sort order and formatting for everything
-    ./pants fmt ::
+    $ ./pants fmt ::
 
 We can also run mypy to check (optional) Python types:
 
     # Run mypy on everything
-    ./pants typecheck ::
+    $ ./pants typecheck ::
 
 
 ## Interactive Python Sessions
@@ -206,13 +206,13 @@ rule of thumb.
 
 To make it simpler to follow these best practices, pants can even auto-generate `BUILD` files:
 
-    ./pants tailor
+    $ ./pants tailor
 
 To list all build targets in a repository:
 
-    ./pants list ::
+    $ ./pants list ::
 
-### BUILD Example: Binaries
+### BUILD Example: Deployment Binaries
  
 PEX files in Pants are declared via the `pex_binary` target type.  Commonly used optiones include the
 binary name and the dependencies, but also the interpreter compatibility as well as the target platform.
@@ -227,6 +227,13 @@ This allows users to build binaries for different Python versions and operating 
       ]
     )
 
+Pants also comes with direct integration into Docker, enabling you to ship your PEX files in Docker images.
+PEX understands the Dockerfile syntax and knows which Docker images to rebuild at what point in time:
+
+    $ ./pants package src/docker/math_fun/cli::
+    $ docker run -it --rm math_fun:latest --version
+
+
 ### Build Example: Source Distributions
 
 In addition to PEX files, Pants can also generate source distributions. Source distributions can be installed
@@ -235,7 +242,7 @@ via `pip` and uploaded to PyPi.org. All you need is a `python_distribution`:
     python_distribution(
       name='wheel',
       dependencies=[':lib'], # reference libraries to include
-      provides=setup_py(
+      provides=python_artifact(
         name='math_fun',
         version='0.0.24', # can also be dynamic. BUILD files are just Python
         description='Math lib as a source distribution',
