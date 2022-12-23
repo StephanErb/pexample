@@ -11,19 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9]
+        python-version: ['3.10', '3.11']
     steps:
 
     - uses: actions/checkout@v2
 
-    - uses: actions/cache@v2
-      id: cache
+    - name: Initialize Pants
+      uses: pantsbuild/actions/init-pants@main
       with:
-        path: |
-          ~/.cache/pants/setup
-          ~/.cache/pants/named_caches
-          ~/.cache/pants/lmdb_store
-        key: ${{ runner.os }}-
+      # cache0 makes it easy to bust the cache if needed
+        gha-cache-key: cache0-py${{ matrix.python-version }}
+        named-caches-hash: ${{ hashFiles('3rdparty/python/*.lock') }}
+        cache-lmdb-store: 'true'
 
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
@@ -36,7 +35,7 @@ jobs:
 
     - name: Lint
       run: | 
-        ./pants lint typecheck ::
+        ./pants tailor --check update-build-files --check lint check ::
 
     - name: Test
       run: |

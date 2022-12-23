@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.7.0"
+pants_version = "2.15.0rc0"
 
 backend_packages = [
   'pants.backend.python',
@@ -7,7 +7,7 @@ backend_packages = [
   'pants.backend.python.lint.isort',
   'pants.backend.python.lint.flake8',
   'pants.backend.python.typecheck.mypy',
-  'pants.backend.experimental.docker',
+  'pants.backend.docker',
 ]
 
 [source]
@@ -18,20 +18,19 @@ root_patterns = [
   '/tests/python',
 ]
 
-[python-setup]
+[python]
+enable_resolves = true
 # The default interpreter compatibility for code in this repo. Individual targets can override
 #  this with the `interpreter_constraints` field. See
 #  https://www.pantsbuild.org/docs/python-interpreter-compatibility.
 interpreter_constraints = [">=3.8"]
 
-# Use a constraints file. See https://www.pantsbuild.org/docs/python-third-party-dependencies.
-requirement_constraints = "3rdparty/python/constraints.txt"
-
+[python-bootstrap]
 # We search for interpreters on both on the $PATH and in the `$(pyenv root)/versions` folder.
 #  If you're using macOS, you may want to leave off the <PATH> entry to avoid using the
 #  problematic system Pythons. See
 #  https://www.pantsbuild.org/docs/python-interpreter-compatibility#changing-the-interpreter-search-path.
-interpreter_search_paths = ["<PATH>", "<PYENV>"]
+search_path = ["<PATH>", "<PYENV>"]
 
 [flake8]
 config = ".flake8"
