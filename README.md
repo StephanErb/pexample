@@ -119,7 +119,7 @@ On build servers such as Jenkins it can also be useful to run tests for anything
 that changed between branches or since a particular commit:
 
     # Run tests for anything changed on this branch (compared to master)
-    $ ./pants --changed-since=origin/master --changed-dependees=transitive test
+    $ ./pants --changed-since=origin/main --changed-dependees=transitive test
 
 
 ## Python Code Quality Tools
@@ -135,7 +135,7 @@ Pants ships with a plugins such as `isort`, `black`, and `flake8` to ensure code
 We can also run mypy to check (optional) Python types:
 
     # Run mypy on everything
-    $ ./pants typecheck ::
+    $ ./pants check ::
 
 
 ## Interactive Python Sessions
@@ -188,7 +188,7 @@ such as compilation and fine-grained cache invalidation.
 Components in pants are defined using `BUILD` files containing directives (so called targets) such
 as:
 
-    python_library(
+    python_source(
       name='mytarget',
       dependencies=[
         '3rdparty/python:external_dep',
@@ -206,7 +206,7 @@ rule of thumb.
 
 To make it simpler to follow these best practices, pants can even auto-generate `BUILD` files:
 
-    $ ./pants tailor
+    $ ./pants tailor ::
 
 To list all build targets in a repository:
 
@@ -251,7 +251,8 @@ via `pip` and uploaded to PyPi.org. All you need is a `python_distribution`:
           'Programming Language :: Python',
         ]   
       ),  
-      setup_py_commands=["bdist_wheel", "sdist"]
+      sdist=True,
+      wheel=True,
     )
 
 Pants can the be used to generate the source distribution. Similar to binaries, those will be placed in the `dist` folder:
