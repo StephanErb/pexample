@@ -11,6 +11,6 @@ pex_binary(
     entry_point="math_fun.cli.main:main",
     platforms=[
         "current",
-        "macosx-10.9-x86_64-cp-38-cp38",
+        "macosx-10.9-x86_64-cp-310-cp310",
     ],
 )
