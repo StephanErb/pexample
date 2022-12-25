@@ -33,12 +33,16 @@ interpreter_constraints = [">=3.10"]
 search_path = ["<PATH>", "<PYENV>"]
 
 [flake8]
+lockfile = '3rdparty/python/flake8.lock'
 config = ".flake8"
 
 [isort]
+lockfile = '3rdparty/python/isort.lock'
 config = [".isort.cfg"]
 
 [mypy]
+lockfile = '3rdparty/python/mypy.lock'
+version = 'mypy==0.991'
 config = ".mypy.ini"
 
 # Let's be a good OSS citizen!
