@@ -4,7 +4,7 @@ import numpy as np
 
 
 def describe():
-    return "%s %s with Numpy %s on %s" % (
+    return "{} {} with Numpy {} on {}".format(
         python_implementation(),
         python_version(),
         np.__version__,

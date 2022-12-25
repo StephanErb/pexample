@@ -6,6 +6,8 @@ backend_packages = [
   'pants.backend.python.lint.black',
   'pants.backend.python.lint.isort',
   'pants.backend.python.lint.flake8',
+  'pants.backend.python.lint.docformatter',
+  'pants.backend.python.lint.pyupgrade',
   'pants.backend.python.typecheck.mypy',
   'pants.backend.docker',
 ]
@@ -23,7 +25,7 @@ enable_resolves = true
 # The default interpreter compatibility for code in this repo. Individual targets can override
 #  this with the `interpreter_constraints` field. See
 #  https://www.pantsbuild.org/docs/python-interpreter-compatibility.
-interpreter_constraints = [">=3.8"]
+interpreter_constraints = [">=3.10"]
 
 [python-bootstrap]
 # We search for interpreters on both on the $PATH and in the `$(pyenv root)/versions` folder.
@@ -33,12 +35,16 @@ interpreter_constraints = [">=3.8"]
 search_path = ["<PATH>", "<PYENV>"]
 
 [flake8]
+lockfile = '3rdparty/python/flake8.lock'
 config = ".flake8"
 
 [isort]
+lockfile = '3rdparty/python/isort.lock'
 config = [".isort.cfg"]
 
 [mypy]
+lockfile = '3rdparty/python/mypy.lock'
+version = 'mypy==0.991'
 config = ".mypy.ini"
 
 # Let's be a good OSS citizen!
